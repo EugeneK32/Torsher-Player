@@ -1,0 +1,57 @@
+name: Bug report
+description: Report a reproducible Torsher Player problem
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the actual and expected behavior.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Torsher Player version
+      placeholder: v4.2.1 or commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - Windows
+        - Linux
+        - macOS
+    validations:
+      required: true
+  - type: input
+    id: architecture
+    attributes:
+      label: CPU architecture
+      placeholder: x64 / arm64
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Launch with ...
+        2. Open ...
+        3. Press ...
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant log excerpt
+      description: Remove tokens, private URLs and other secrets before posting.
+      render: text
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: GPU/driver, media source, codec/container, controller model, screenshots, etc.

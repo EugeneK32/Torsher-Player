@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>TorsherPlayer</AssemblyName>
+    <RootNamespace>TorsherPlayer</RootNamespace>
+    <AssemblyTitle>Torsher Player</AssemblyTitle>
+    <Product>Torsher Player</Product>
+    <Description>Controller-first external media player for Lampa</Description>
+    <Version>4.2.1</Version>
+    <RuntimeIdentifiers>win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
+    <ApplicationManifest Condition="$([MSBuild]::IsOSPlatform('Windows'))">app.manifest</ApplicationManifest>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <PublishTrimmed>false</PublishTrimmed>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
+    <PackageReference Include="Material.Icons.Avalonia" Version="3.0.2" />
+    <PackageReference Include="MonoTorrent" Version="3.0.2" />
+  </ItemGroup>
+
+  <!-- Native payload is intentionally outside NuGet. CI/local setup puts pinned
+       binaries under /native/<RID>; system libraries are also supported on Unix. -->
+  <ItemGroup Condition="'$(RuntimeIdentifier)' != '' and Exists('$(MSBuildProjectDirectory)/../../native/$(RuntimeIdentifier)')">
+    <Content Include="$(MSBuildProjectDirectory)/../../native/$(RuntimeIdentifier)/*"
+             Exclude="$(MSBuildProjectDirectory)/../../native/$(RuntimeIdentifier)/.gitkeep">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>false</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+</Project>

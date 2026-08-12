@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "windows": {
+    "win-x64": {
+      "mpv": {
+        "version": "20260610-git-304426c",
+        "url": "https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260610/mpv-dev-x86_64-20260610-git-304426c.7z",
+        "sha256": "8cbb25ea784f01afbb3f904217cab1317430a8bcfd5680fd827a866367f71cc9"
+      },
+      "sdl3": {
+        "version": "3.4.10",
+        "url": "https://github.com/libsdl-org/SDL/releases/download/release-3.4.10/SDL3-3.4.10-win32-x64.zip",
+        "sha256": "86e779617c6c2d4e20716e14a5bd9b1210595d62b88a05fed1ccd7fd53c902f9"
+      }
+    },
+    "win-arm64": {
+      "mpv": {
+        "version": "20260610-git-304426c",
+        "url": "https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260610/mpv-dev-aarch64-20260610-git-304426c.7z",
+        "sha256": "d9dd60db1c7b24db2e19d041f70abf0a4995f3e9eadf80a34e54f72300df6ed4"
+      },
+      "sdl3": {
+        "version": "3.4.10",
+        "url": "https://github.com/libsdl-org/SDL/releases/download/release-3.4.10/SDL3-3.4.10-win32-arm64.zip",
+        "sha256": "4a1b9e43aef8ae645efd265a9dd8ad0ef999cc859944e496510bc06fab43980a"
+      }
+    }
+  }
+}

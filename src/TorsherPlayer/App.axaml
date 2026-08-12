@@ -1,0 +1,165 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="TorsherPlayer.App"
+             RequestedThemeVariant="Dark">
+  <Application.Styles>
+    <FluentTheme />
+    <materialIcons:MaterialIconStyles />
+
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{DynamicResource AppBackgroundBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource ControlForegroundBrush}"/>
+    </Style>
+
+    <Style Selector="Button.playerButton">
+      <Setter Property="Foreground" Value="{DynamicResource ControlForegroundBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="{DynamicResource UiIconButtonPadding}"/>
+      <Setter Property="Margin" Value="{DynamicResource UiButtonMargin}"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Focusable" Value="True"/>
+      <Setter Property="FocusAdorner" Value="{x:Null}"/>
+      <Setter Property="MinWidth" Value="{DynamicResource UiIconButtonSize}"/>
+      <Setter Property="MinHeight" Value="{DynamicResource UiIconButtonSize}"/>
+    </Style>
+    <Style Selector="Button.playerButton:pointerover">
+      <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+    <Style Selector="Button.playerButton:focus">
+      <Setter Property="Background" Value="{DynamicResource FocusBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource FocusTextBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource FocusBrush}"/>
+      <Setter Property="BorderThickness" Value="3"/>
+    </Style>
+    <Style Selector="Button.playerButton:pressed">
+      <Setter Property="Opacity" Value="0.72"/>
+    </Style>
+
+    <Style Selector="Button.menuItem">
+      <Setter Property="Foreground" Value="{DynamicResource ControlForegroundBrush}"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="Padding" Value="{DynamicResource UiListPadding}"/>
+      <Setter Property="Margin" Value="0,3"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+      <Setter Property="Focusable" Value="True"/>
+      <Setter Property="FocusAdorner" Value="{x:Null}"/>
+    </Style>
+    <Style Selector="Button.menuItem:pointerover">
+      <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+    </Style>
+    <Style Selector="Button.menuItem.selected">
+      <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+    <Style Selector="Button.menuItem:focus">
+      <Setter Property="Background" Value="{DynamicResource FocusBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource FocusTextBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource FocusBrush}"/>
+    </Style>
+
+    <Style Selector="Slider.seekSlider">
+      <Setter Property="Foreground" Value="{DynamicResource SeekBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource ControlBorderBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <!-- The player draws its own seek focus border. Suppress Fluent's second
+           focus adorner so focused progress has one clean outline only. -->
+      <Setter Property="FocusAdorner" Value="{x:Null}"/>
+    </Style>
+    <Style Selector="Slider.seekSlider /template/ Thumb">
+      <Setter Property="Background" Value="{DynamicResource SeekBrush}"/>
+    </Style>
+
+    <Style Selector="Slider.volumeSlider">
+      <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource ControlBorderBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="FocusAdorner" Value="{x:Null}"/>
+    </Style>
+    <Style Selector="Slider.volumeSlider /template/ Thumb">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+
+    <Style Selector="Border.settingRow">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="{DynamicResource UiSettingPadding}"/>
+      <Setter Property="Margin" Value="{DynamicResource UiSettingMargin}"/>
+    </Style>
+
+    <Style Selector="Border.settingRow:pointerover">
+      <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.secondary">
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+    </Style>
+  </Application.Styles>
+
+  <Application.Resources>
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0A0B0E"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#16181D"/>
+    <SolidColorBrush x:Key="SurfaceAltBrush" Color="#202329"/>
+    <SolidColorBrush x:Key="PanelBrush" Color="#E6121418"/>
+    <SolidColorBrush x:Key="Panel2Brush" Color="#F2181A20"/>
+    <SolidColorBrush x:Key="ControlForegroundBrush" Color="#F5F6F8"/>
+    <SolidColorBrush x:Key="MutedBrush" Color="#A9AFB8"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#F5F6F8"/>
+    <SolidColorBrush x:Key="FocusBrush" Color="#F5F6F8"/>
+    <SolidColorBrush x:Key="FocusTextBrush" Color="#101114"/>
+    <SolidColorBrush x:Key="ControlBorderBrush" Color="#515761"/>
+    <SolidColorBrush x:Key="SeekBrush" Color="#E7E9ED"/>
+    <Color x:Key="OsdGradientTopColor">#00101012</Color>
+    <Color x:Key="OsdGradientMidColor">#E6101013</Color>
+    <Color x:Key="OsdGradientBottomColor">#FA101013</Color>
+
+    <x:Double x:Key="UiFontSmall">25.2</x:Double>
+    <x:Double x:Key="UiFont">30.6</x:Double>
+    <x:Double x:Key="UiFontLarge">39.6</x:Double>
+    <x:Double x:Key="UiFontXLarge">50.4</x:Double>
+    <x:Double x:Key="UiFontHuge">68.4</x:Double>
+    <x:Double x:Key="UiIcon">39.6</x:Double>
+    <x:Double x:Key="UiIconSmall">32.4</x:Double>
+    <x:Double x:Key="UiIconButtonSize">79.2</x:Double>
+    <Thickness x:Key="UiIconButtonPadding">18</Thickness>
+    <Thickness x:Key="UiOsdMargin">57.6,126,57.6,43.2</Thickness>
+    <Thickness x:Key="UiMenuPadding">43.2</Thickness>
+    <x:Double x:Key="UiMenuWidth">972</x:Double>
+    <x:Double x:Key="UiSettingValueWidth">198</x:Double>
+    <x:Double x:Key="UiSliderHeight">57.6</x:Double>
+    <!-- Overrides consumed by Avalonia's Fluent Slider template. Keep these in
+         lockstep with UiSliderHeight so the seek thumb scales instead of clipping. -->
+    <GridLength x:Key="SliderPreContentMargin">12.6</GridLength>
+    <GridLength x:Key="SliderPostContentMargin">12.6</GridLength>
+    <x:Double x:Key="SliderHorizontalHeight">57.6</x:Double>
+    <x:Double x:Key="SliderHorizontalThumbWidth">32.4</x:Double>
+    <x:Double x:Key="SliderHorizontalThumbHeight">32.4</x:Double>
+    <x:Double x:Key="SliderTrackThemeHeight">7.2</x:Double>
+    <CornerRadius x:Key="SliderThumbCornerRadius">16.2</CornerRadius>
+    <x:Double x:Key="UiTimeWidth">135</x:Double>
+    <Thickness x:Key="UiButtonPadding">28.8,18,28.8,18</Thickness>
+    <Thickness x:Key="UiButtonMargin">7.2</Thickness>
+    <Thickness x:Key="UiListPadding">28.8,21.6,28.8,21.6</Thickness>
+    <Thickness x:Key="UiSettingPadding">25.2</Thickness>
+    <Thickness x:Key="UiSettingMargin">0,5.4,0,5.4</Thickness>
+    <Thickness x:Key="UiToastPadding">50.4,36,50.4,36</Thickness>
+    <Thickness x:Key="UiBufferPadding">39.6,25.2,39.6,25.2</Thickness>
+    <Thickness x:Key="UiInfoPillPadding">21.6,12.6</Thickness>
+    <Thickness x:Key="UiInfoPillMargin">28.8,0</Thickness>
+    <x:Double x:Key="UiInfoPillSpacing">21.6</x:Double>
+    <x:Double x:Key="UiVolumePanelWidth">432</x:Double>
+    <Thickness x:Key="UiVolumePanelMargin">0,0,28.8,151.2</Thickness>
+    <Thickness x:Key="UiVolumePanelPadding">28.8,21.6</Thickness>
+    <Thickness x:Key="UiStatusPadding">64.8</Thickness>
+    <x:Double x:Key="UiStatusWidth">1200</x:Double>
+  </Application.Resources>
+</Application>

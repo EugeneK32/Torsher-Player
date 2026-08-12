@@ -1,0 +1,244 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:player="using:TorsherPlayer.Player"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:Class="TorsherPlayer.MainWindow"
+        Title="Torsher Player"
+        Background="{DynamicResource AppBackgroundBrush}"
+        Foreground="{DynamicResource ControlForegroundBrush}"
+        WindowStartupLocation="CenterScreen"
+        DragDrop.AllowDrop="True"
+        XYFocus.NavigationModes="Enabled"
+        XYFocus.LeftNavigationStrategy="RectilinearDistance"
+        XYFocus.RightNavigationStrategy="RectilinearDistance"
+        XYFocus.UpNavigationStrategy="RectilinearDistance"
+        XYFocus.DownNavigationStrategy="RectilinearDistance">
+
+  <Grid x:Name="Root" Background="{DynamicResource AppBackgroundBrush}">
+    <player:MpvVideoView x:Name="VideoGl" Focusable="False"/>
+
+    <Border x:Name="Toast" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1"
+            CornerRadius="12" Padding="{DynamicResource UiToastPadding}" IsHitTestVisible="False">
+      <TextBlock x:Name="ToastText" FontSize="{DynamicResource UiFontHuge}" FontWeight="SemiBold"/>
+    </Border>
+
+    <Border x:Name="BufferingBadge" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="0,150,0,0" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource ControlBorderBrush}"
+            BorderThickness="1" CornerRadius="10" Padding="{DynamicResource UiBufferPadding}" IsHitTestVisible="False">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <materialIcons:MaterialIcon Kind="Refresh" Animation="Spin" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/>
+        <TextBlock Text="Буферизация" FontSize="{DynamicResource UiFontLarge}" FontWeight="SemiBold"/>
+        <TextBlock x:Name="BufferingPercent" FontSize="{DynamicResource UiFontLarge}" Classes="secondary"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Classic playback OSD. Every action is a real focusable control, so the same
+         UI works with mouse, keyboard, remote and SDL gamepads. -->
+    <Grid x:Name="Osd" VerticalAlignment="Bottom">
+      <Grid.Background>
+        <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+          <GradientStop Color="{DynamicResource OsdGradientTopColor}" Offset="0"/>
+          <GradientStop Color="{DynamicResource OsdGradientMidColor}" Offset="0.42"/>
+          <GradientStop Color="{DynamicResource OsdGradientBottomColor}" Offset="1"/>
+        </LinearGradientBrush>
+      </Grid.Background>
+      <Grid Margin="{DynamicResource UiOsdMargin}" RowDefinitions="Auto,Auto,Auto">
+        <Grid ColumnDefinitions="*" Margin="2,0,2,8">
+          <TextBlock x:Name="MediaTitle" FontSize="{DynamicResource UiFontLarge}" FontWeight="SemiBold"
+                     TextTrimming="CharacterEllipsis"/>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,0,0,10" ColumnDefinitions="Auto,*,Auto">
+          <TextBlock x:Name="PositionText" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center" Width="{DynamicResource UiTimeWidth}"/>
+          <Border x:Name="ProgressFocusBorder" Grid.Column="1" BorderBrush="{DynamicResource FocusBrush}"
+                  BorderThickness="0" CornerRadius="8" Padding="4,0" ClipToBounds="False">
+            <Slider x:Name="Progress" Classes="seekSlider" Minimum="0" Maximum="1" Value="0"
+                    SmallChange="10" LargeChange="60" Height="{DynamicResource UiSliderHeight}" Focusable="True"/>
+          </Border>
+          <TextBlock x:Name="DurationText" Grid.Column="2" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center"
+                     TextAlignment="Right" Width="{DynamicResource UiTimeWidth}"/>
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
+          <Button x:Name="SeekBackButton" Classes="playerButton" Click="SeekBack_Click" ToolTip.Tip="Назад на 10 секунд">
+            <materialIcons:MaterialIcon Kind="Rewind10" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+          <Button x:Name="PlayButton" Grid.Column="1" Classes="playerButton" Click="Play_Click" ToolTip.Tip="Воспроизведение / пауза">
+            <materialIcons:MaterialIcon x:Name="PlayIcon" Kind="Pause" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+          <Button x:Name="SeekForwardButton" Grid.Column="2" Classes="playerButton" Click="SeekForward_Click" ToolTip.Tip="Вперёд на 10 секунд">
+            <materialIcons:MaterialIcon Kind="FastForward10" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+          <Button x:Name="EpisodesButton" Grid.Column="3" Classes="playerButton" Click="Episodes_Click" ToolTip.Tip="Серии / файлы" IsVisible="False">
+            <materialIcons:MaterialIcon Kind="PlaylistPlay" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+          <!-- Keep every action button in one left-aligned group. Headphones
+               distinguish track selection from the speaker used for volume. -->
+          <Button Grid.Column="4" Classes="playerButton" Click="Audio_Click" ToolTip.Tip="Аудиодорожка">
+            <materialIcons:MaterialIcon Kind="Headphones" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+          <Button Grid.Column="5" Classes="playerButton" Click="Subs_Click" ToolTip.Tip="Субтитры">
+            <materialIcons:MaterialIcon Kind="Subtitles" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+          <Button Grid.Column="6" Classes="playerButton" Click="Settings_Click" ToolTip.Tip="Настройки">
+            <materialIcons:MaterialIcon Kind="Cog" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+          <Button Grid.Column="7" Classes="playerButton" Click="Screenshot_Click" ToolTip.Tip="Снимок экрана">
+            <materialIcons:MaterialIcon Kind="Camera" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+
+          <Button x:Name="VolumeButton" Grid.Column="8" Classes="playerButton" Click="Volume_Click" ToolTip.Tip="Громкость">
+            <materialIcons:MaterialIcon x:Name="VolumeButtonIcon" Kind="VolumeHigh" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+
+          <Border Grid.Column="11" VerticalAlignment="Center" Margin="{DynamicResource UiInfoPillMargin}"
+                  Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource ControlBorderBrush}"
+                  BorderThickness="1" CornerRadius="8" Padding="{DynamicResource UiInfoPillPadding}">
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource UiInfoPillSpacing}">
+              <TextBlock x:Name="BufferText" FontSize="{DynamicResource UiFontSmall}" Classes="secondary" VerticalAlignment="Center"/>
+              <TextBlock x:Name="VolumeText" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+          <Button Grid.Column="9" Classes="playerButton" Click="Fullscreen_Click" ToolTip.Tip="Полный экран">
+            <materialIcons:MaterialIcon x:Name="FullscreenIcon" Kind="Fullscreen" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+        </Grid>
+      </Grid>
+
+      <!-- Compact volume editor. It overlays the OSD instead of taking layout
+           space and disappears shortly after the user finishes adjusting it. -->
+      <Border x:Name="VolumePanel" IsVisible="False"
+              HorizontalAlignment="Right" VerticalAlignment="Bottom"
+              Width="{DynamicResource UiVolumePanelWidth}" Margin="{DynamicResource UiVolumePanelMargin}"
+              Padding="{DynamicResource UiVolumePanelPadding}"
+              Background="{DynamicResource Panel2Brush}" BorderBrush="{DynamicResource AccentBrush}"
+              BorderThickness="1" CornerRadius="12">
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="Auto,*">
+            <TextBlock Text="Громкость" FontSize="{DynamicResource UiFont}" FontWeight="SemiBold"/>
+            <TextBlock x:Name="VolumePanelValue" Grid.Column="1" HorizontalAlignment="Right"
+                       FontSize="{DynamicResource UiFont}" FontWeight="SemiBold"/>
+          </Grid>
+          <Slider x:Name="VolumeSlider" Classes="volumeSlider" Minimum="0" Maximum="150" Value="100"
+                  SmallChange="5" LargeChange="10" Height="{DynamicResource UiSliderHeight}" Focusable="True"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- Right-side menus: lists are built from regular Buttons, not a ListBox, so
+         spatial focus is visible and identical for keyboard/gamepad navigation. -->
+    <Border x:Name="SidePanel" IsVisible="False" HorizontalAlignment="Right" VerticalAlignment="Stretch"
+            Width="{DynamicResource UiMenuWidth}" Background="{DynamicResource Panel2Brush}" Padding="{DynamicResource UiMenuPadding}"
+            BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1,0,0,0">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,18">
+          <Button x:Name="SideBackButton" Classes="playerButton" Click="CloseMenu_Click" ToolTip.Tip="Назад">
+            <materialIcons:MaterialIcon Kind="ArrowLeft" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+          </Button>
+          <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+            <TextBlock x:Name="SideTitle" FontSize="{DynamicResource UiFontXLarge}" FontWeight="Bold"/>
+          </StackPanel>
+        </Grid>
+
+        <ScrollViewer x:Name="MenuScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+          <StackPanel x:Name="MenuItemsHost"/>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="SettingsScroll" Grid.Row="1" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel>
+            <Border Classes="settingRow">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBlock Text="Тема" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center"/>
+                <Button x:Name="ThemePrevButton" Grid.Column="1" Classes="playerButton" CommandParameter="theme,-1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="ChevronLeft" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+                <TextBlock x:Name="ThemeValue" Grid.Column="2" MinWidth="{DynamicResource UiSettingValueWidth}" FontSize="{DynamicResource UiFont}" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="ThemeNextButton" Grid.Column="3" Classes="playerButton" CommandParameter="theme,1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="ChevronRight" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+              </Grid>
+            </Border>
+            <Border Classes="settingRow">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBlock Text="Масштаб интерфейса" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center"/>
+                <Button x:Name="UiScaleMinusButton" Grid.Column="1" Classes="playerButton" CommandParameter="ui,-1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Minus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+                <TextBlock x:Name="UiScaleValue" Grid.Column="2" MinWidth="{DynamicResource UiSettingValueWidth}" FontSize="{DynamicResource UiFont}" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="UiScalePlusButton" Grid.Column="3" Classes="playerButton" CommandParameter="ui,1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Plus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+              </Grid>
+            </Border>
+            <Border Classes="settingRow">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBlock Text="Размер субтитров" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center"/>
+                <Button x:Name="SubScaleMinusButton" Grid.Column="1" Classes="playerButton" CommandParameter="subscale,-1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Minus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+                <TextBlock x:Name="SubScaleValue" Grid.Column="2" MinWidth="{DynamicResource UiSettingValueWidth}" FontSize="{DynamicResource UiFont}" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="SubScalePlusButton" Grid.Column="3" Classes="playerButton" CommandParameter="subscale,1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Plus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+              </Grid>
+            </Border>
+            <Border Classes="settingRow">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBlock Text="Задержка субтитров" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center"/>
+                <Button x:Name="SubDelayMinusButton" Grid.Column="1" Classes="playerButton" CommandParameter="subdelay,-1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Minus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+                <TextBlock x:Name="SubDelayValue" Grid.Column="2" MinWidth="{DynamicResource UiSettingValueWidth}" FontSize="{DynamicResource UiFont}" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="SubDelayPlusButton" Grid.Column="3" Classes="playerButton" CommandParameter="subdelay,1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Plus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+              </Grid>
+            </Border>
+            <Border Classes="settingRow">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBlock Text="Задержка аудио" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center"/>
+                <Button x:Name="AudioDelayMinusButton" Grid.Column="1" Classes="playerButton" CommandParameter="audiodelay,-1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Minus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+                <TextBlock x:Name="AudioDelayValue" Grid.Column="2" MinWidth="{DynamicResource UiSettingValueWidth}" FontSize="{DynamicResource UiFont}" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="AudioDelayPlusButton" Grid.Column="3" Classes="playerButton" CommandParameter="audiodelay,1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Plus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+              </Grid>
+            </Border>
+            <Border Classes="settingRow">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBlock Text="Скорость" FontSize="{DynamicResource UiFont}" VerticalAlignment="Center"/>
+                <Button x:Name="SpeedMinusButton" Grid.Column="1" Classes="playerButton" CommandParameter="speed,-1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Minus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+                <TextBlock x:Name="SpeedValue" Grid.Column="2" MinWidth="{DynamicResource UiSettingValueWidth}" FontSize="{DynamicResource UiFont}" TextAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="SpeedPlusButton" Grid.Column="3" Classes="playerButton" CommandParameter="speed,1" Click="SettingAdjust_Click"><materialIcons:MaterialIcon Kind="Plus" Width="{DynamicResource UiIconSmall}" Height="{DynamicResource UiIconSmall}"/></Button>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+      </Grid>
+    </Border>
+
+    <!-- Initial torrent file picker. It is also fully focus-navigable. -->
+    <Grid x:Name="SourcePickerPanel" IsVisible="False" Background="{DynamicResource PanelBrush}">
+      <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="{DynamicResource UiStatusWidth}" MaxHeight="820"
+              Padding="{DynamicResource UiStatusPadding}" Background="{DynamicResource Panel2Brush}"
+              BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1" CornerRadius="14">
+        <Grid RowDefinitions="Auto,*,Auto">
+          <StackPanel Margin="0,0,0,18">
+            <TextBlock Text="Выберите серию или файл" FontSize="{DynamicResource UiFontXLarge}" FontWeight="Bold" TextAlignment="Center"/>
+            <TextBlock x:Name="SourcePickerSubtitle" Text="Torrent содержит несколько видеофайлов" Classes="secondary"
+                       FontSize="{DynamicResource UiFont}" TextAlignment="Center" Margin="0,8,0,0"/>
+          </StackPanel>
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="SourceFilesHost"/>
+          </ScrollViewer>
+
+        </Grid>
+      </Border>
+    </Grid>
+
+    <Grid x:Name="StatusPanel" Background="{DynamicResource PanelBrush}">
+      <Border HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="{DynamicResource UiStatusWidth}"
+              Padding="{DynamicResource UiStatusPadding}" Background="{DynamicResource Panel2Brush}"
+              BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1" CornerRadius="14">
+        <StackPanel>
+          <TextBlock x:Name="StatusTitle" Text="Подготовка воспроизведения" FontSize="{DynamicResource UiFontXLarge}" FontWeight="Bold" TextAlignment="Center"/>
+          <ProgressBar x:Name="StatusProgress" IsIndeterminate="True" Height="6" Margin="0,18,0,0"/>
+          <TextBlock x:Name="StatusDetail" Text="Инициализация видеодвижка…" FontSize="{DynamicResource UiFont}"
+                     Classes="secondary" TextWrapping="Wrap" TextAlignment="Center" Margin="0,14,0,22"/>
+          <StackPanel x:Name="ErrorButtons" IsVisible="False" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+            <Button x:Name="RetryButton" Classes="playerButton" Click="Retry_Click" ToolTip.Tip="Повторить">
+              <materialIcons:MaterialIcon Kind="Refresh" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+            </Button>
+            <Button x:Name="ExitButton" Classes="playerButton" Click="Exit_Click" ToolTip.Tip="Выйти">
+              <materialIcons:MaterialIcon Kind="Close" Width="{DynamicResource UiIcon}" Height="{DynamicResource UiIcon}"/>
+            </Button>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>

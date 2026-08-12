@@ -1,0 +1,35 @@
+# .NET / IDE
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build / generated artifacts
+dist/
+artifacts/
+.cache/
+.tools/
+TestResults/
+
+# Downloaded native runtimes (manifests and .gitkeep stay tracked)
+native/*/*.dll
+native/*/*.so
+native/*/*.so.*
+native/*/*.dylib
+native/*/*.a
+native/*/*.lib
+native/*/*.pdb
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Python helper cache
+__pycache__/
+*.py[cod]
