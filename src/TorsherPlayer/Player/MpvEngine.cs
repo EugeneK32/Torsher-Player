@@ -68,7 +68,8 @@ public sealed unsafe class MpvEngine : IDisposable
             SetOption("network-timeout", "180");
         SetOption("alang", "rus,ru,eng,en");
         SetOption("slang", "rus,ru,eng,en");
-        SetOption("keep-open", "yes");
+        SetOption("sid", "no");
+        SetOption("keep-open", "no");
         SetOption("osd-level", "0");
         if (!string.IsNullOrWhiteSpace(launch.UserAgent)) SetOption("user-agent", launch.UserAgent!);
         if (!string.IsNullOrWhiteSpace(launch.Referrer)) SetOption("referrer", launch.Referrer!);
@@ -167,6 +168,7 @@ public sealed unsafe class MpvEngine : IDisposable
         // Set before loadfile so a very fast local file cannot beat FILE_LOADED.
         Interlocked.Exchange(ref _pendingResume, resumeSeconds > 0.1 ? resumeSeconds : 0);
         Command("set", "pause", "no");
+        Command("set", "sid", "no");
         Command("loadfile", _launch.Url!, "replace");
     }
 
@@ -283,6 +285,14 @@ public sealed unsafe class MpvEngine : IDisposable
                         foreach (var file in _launch.SubtitleFiles) CommandUnsequenced("sub-add", file, "auto");
                         foreach (var file in _launch.AudioFiles) CommandUnsequenced("audio-add", file, "auto");
                         var resume = Interlocked.Exchange(ref _pendingResume, 0);
+                        // Read the loaded file directly: observed duration can still belong to the previous episode.
+                        if (resume > .1 &&
+                            double.TryParse(MpvNative.GetString(_mpv, "duration"), NumberStyles.Float, CultureInfo.InvariantCulture, out var duration) &&
+                            IsNearEnd(resume, duration))
+                        {
+                            _log.Info($"Saved position {resume:0.0}s is near the end ({duration:0.0}s); starting from the beginning");
+                            resume = 0;
+                        }
                         if (resume > .1) Command("seek", F(resume), "absolute+exact");
                         PlayerEvent?.Invoke("file_loaded");
                         break;
@@ -351,6 +361,10 @@ public sealed unsafe class MpvEngine : IDisposable
         catch (Exception ex) { _log.Exception(ex, $"property-change {name}"); }
     }
 
+    private static bool IsNearEnd(double position, double duration) =>
+        double.IsFinite(position) && double.IsFinite(duration) && duration > 0 &&
+        (position >= Math.Max(0, duration - 5) || position / duration >= 0.98);
+
     private void HandleEndFile(IntPtr data)
     {
         if (data == IntPtr.Zero) return;
@@ -364,9 +378,7 @@ public sealed unsafe class MpvEngine : IDisposable
         else if (end.Reason == MpvNative.MpvEndFileReason.Eof)
         {
             var current = Snapshot;
-            var nearEnd = current.Duration > 0 &&
-                          (current.Position >= Math.Max(0, current.Duration - 5) || current.Position / current.Duration >= 0.98);
-            if (nearEnd)
+            if (IsNearEnd(current.Position, current.Duration))
             {
                 Update(s => s with { Ended = true, Position = Math.Max(s.Position, s.Duration) });
                 PlayerEvent?.Invoke("completed");

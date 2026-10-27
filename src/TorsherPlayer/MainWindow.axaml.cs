@@ -476,7 +476,7 @@ public partial class MainWindow : Window
 
     private void OnPlayerEvent(string name)
     {
-        Dispatcher.Post(async () =>
+        Dispatcher.Post(() =>
         {
             if (_engine is null) return;
             _state = _engine.Snapshot;
@@ -507,16 +507,7 @@ public partial class MainWindow : Window
                     break;
                 case "completed":
                     _reporter.Emit("completed", _state);
-                    await _reporter.FlushAsync(TimeSpan.FromSeconds(1));
-                    if (_torrent is not null && _torrent.MediaFiles.Count > 1)
-                    {
-                        ShowToast("Серия завершена", 1600);
-                        OpenMenu(MenuMode.Episodes);
-                    }
-                    else
-                    {
-                        Close();
-                    }
+                    Close();
                     break;
             }
         });
